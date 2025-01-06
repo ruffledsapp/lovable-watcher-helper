@@ -1,17 +1,12 @@
 import { useState, useCallback } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useDebounce } from "@/hooks/useDebounce";
-
-interface SearchResult {
-  id: string;
-  title: string;
-  synopsis: string;
-  verified?: boolean;
-  type: 'movie' | 'tv';
-  year: string;
-}
+import { SearchResult } from "@/types/search";
+import { SearchItem } from "./search/SearchItem";
+import { useSearchKeyboard } from "@/hooks/useSearchKeyboard";
+import { useToast } from "@/components/ui/use-toast";
 
 // Enhanced mock data with popular shows and movies
 const mockResults: SearchResult[] = [
@@ -69,9 +64,19 @@ export function SearchBar() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
   
-  // Debounce search query to prevent too many API calls
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  const handleSelect = useCallback((result: SearchResult) => {
+    toast({
+      title: "Selected " + result.title,
+      description: "Feature coming soon: detailed view for " + result.type + " content",
+    });
+    console.log("Selected:", result);
+  }, [toast]);
+
+  const { highlightedIndex, handleKeyDown } = useSearchKeyboard(results, handleSelect);
 
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
@@ -101,14 +106,22 @@ export function SearchBar() {
       setResults(filtered);
     } catch (error) {
       console.error("Search error:", error);
+      toast({
+        title: "Search Error",
+        description: "Failed to fetch search results. Please try again.",
+        variant: "destructive",
+      });
       setResults([]);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   return (
-    <Command className="rounded-lg border shadow-md bg-white">
+    <Command 
+      className="rounded-lg border shadow-md bg-white"
+      onKeyDown={handleKeyDown}
+    >
       <CommandInput
         placeholder="Search shows and movies..."
         value={searchQuery}
@@ -119,14 +132,9 @@ export function SearchBar() {
       <CommandList>
         <AnimatePresence mode="wait">
           {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center justify-center p-4"
-            >
+            <div className="flex items-center justify-center p-4">
               <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
-            </motion.div>
+            </div>
           )}
           
           {!isLoading && results.length === 0 && searchQuery && (
@@ -136,37 +144,19 @@ export function SearchBar() {
           )}
           
           {!isLoading && results.length > 0 && (
-            <CommandGroup heading="Search Results" className="max-h-[300px] overflow-auto">
-              {results.map((result) => (
-                <motion.div
+            <CommandGroup heading="Search Results" className="max-h-[400px] overflow-auto">
+              {results.map((result, index) => (
+                <CommandItem
                   key={result.id}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
+                  value={result.title}
+                  onSelect={() => handleSelect(result)}
                 >
-                  <CommandItem
-                    value={result.title}
-                    className="px-4 py-3 cursor-pointer hover:bg-purple-50"
-                  >
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{result.title}</span>
-                        <span className="text-sm text-gray-500">({result.year})</span>
-                        <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
-                          {result.type}
-                        </span>
-                        {result.verified && (
-                          <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
-                            Verified
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-600 line-clamp-2">
-                        {result.synopsis}
-                      </span>
-                    </div>
-                  </CommandItem>
-                </motion.div>
+                  <SearchItem
+                    result={result}
+                    onSelect={handleSelect}
+                    isHighlighted={index === highlightedIndex}
+                  />
+                </CommandItem>
               ))}
             </CommandGroup>
           )}

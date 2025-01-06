@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface SearchResult {
   id: string;
   title: string;
   synopsis: string;
+  verified?: boolean;
 }
 
 // Mock data - replace with actual API call later
@@ -14,17 +16,20 @@ const mockResults: SearchResult[] = [
   {
     id: "1",
     title: "Breaking Bad",
-    synopsis: "A high school chemistry teacher turned methamphetamine manufacturer partners with a former student to secure his family's financial future."
+    synopsis: "A high school chemistry teacher turned methamphetamine manufacturer partners with a former student to secure his family's financial future.",
+    verified: true
   },
   {
     id: "2",
     title: "Stranger Things",
-    synopsis: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl."
+    synopsis: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",
+    verified: true
   },
   {
     id: "3",
     title: "The Crown",
-    synopsis: "This drama follows the political rivalries and romance of Queen Elizabeth II's reign and the events that shaped the second half of the 20th century."
+    synopsis: "This drama follows the political rivalries and romance of Queen Elizabeth II's reign and the events that shaped the second half of the 20th century.",
+    verified: false
   }
 ];
 
@@ -32,8 +37,11 @@ export function SearchBar() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Debounce search query to prevent too many API calls
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
     
     if (!query) {
@@ -60,7 +68,7 @@ export function SearchBar() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   return (
     <Command className="rounded-lg border shadow-md bg-white">
@@ -72,7 +80,7 @@ export function SearchBar() {
       />
       
       <CommandList>
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isLoading && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -91,7 +99,7 @@ export function SearchBar() {
           )}
           
           {!isLoading && results.length > 0 && (
-            <CommandGroup className="max-h-[300px] overflow-auto">
+            <CommandGroup heading="Search Results" className="max-h-[300px] overflow-auto">
               {results.map((result) => (
                 <motion.div
                   key={result.id}
@@ -104,7 +112,14 @@ export function SearchBar() {
                     className="px-4 py-3 cursor-pointer hover:bg-purple-50"
                   >
                     <div className="flex flex-col gap-1">
-                      <span className="font-medium">{result.title}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{result.title}</span>
+                        {result.verified && (
+                          <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
+                            Verified
+                          </span>
+                        )}
+                      </div>
                       <span className="text-sm text-gray-600 line-clamp-2">
                         {result.synopsis}
                       </span>

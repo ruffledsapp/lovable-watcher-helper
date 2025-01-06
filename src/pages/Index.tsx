@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Search } from "lucide-react";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -92,7 +93,7 @@ const Index = () => {
                 className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                  <feature.icon className="h-6 w-6 text-purple-600" />
+                  <Search className="h-6 w-6 text-purple-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>

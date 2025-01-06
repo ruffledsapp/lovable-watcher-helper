@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { useState, useEffect } from "react";
 import { SearchBar } from "@/components/SearchBar";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -16,9 +16,14 @@ const Index = () => {
       <header className="fixed top-0 w-full bg-white/80 backdrop-blur-sm border-b border-purple-100 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent"
+            >
               (my) watcher
-            </div>
+            </motion.div>
             <span className="text-sm text-gray-600 hidden md:inline">
               what makes us different
             </span>
@@ -38,41 +43,60 @@ const Index = () => {
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <motion.h1 
+              className="text-4xl md:text-6xl font-bold mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               <span className="bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
                 We find your
               </span>
-              <span 
-                className={`block mt-2 transition-all duration-1000 transform ${
-                  isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                }`}
+              <motion.span 
+                className="block mt-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
               >
                 Next Watch
-              </span>
-            </h1>
-            <p className="text-lg text-gray-600 mb-8">
+              </motion.span>
+            </motion.h1>
+            <motion.p 
+              className="text-lg text-gray-600 mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
               Search and organize your favorite shows and movies in one place
-            </p>
+            </motion.p>
             
             {/* Search Section */}
-            <div className="max-w-2xl mx-auto">
+            <motion.div 
+              className="max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
               <SearchBar />
-            </div>
+            </motion.div>
           </div>
 
           {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-8 mt-20">
             {features.map((feature, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 * (index + 3) }}
+                className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
                   <feature.icon className="h-6 w-6 text-purple-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

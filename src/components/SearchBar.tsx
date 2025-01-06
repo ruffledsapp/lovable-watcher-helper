@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SearchResult {
   id: string;
@@ -33,7 +34,6 @@ export function SearchBar() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = async (query: string) => {
-    console.log("Searching for:", query);
     setSearchQuery(query);
     
     if (!query) {
@@ -42,17 +42,24 @@ export function SearchBar() {
     }
     
     setIsLoading(true);
+    console.log("Searching for:", query);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Filter mock results - replace with actual API call
-    const filtered = mockResults.filter(result => 
-      result.title.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    setResults(filtered);
-    setIsLoading(false);
+    try {
+      // Simulate API delay - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Filter mock results - replace with actual API call
+      const filtered = mockResults.filter(result => 
+        result.title.toLowerCase().includes(query.toLowerCase())
+      );
+      
+      setResults(filtered);
+    } catch (error) {
+      console.error("Search error:", error);
+      setResults([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -65,36 +72,49 @@ export function SearchBar() {
       />
       
       <CommandList>
-        {isLoading && (
-          <div className="flex items-center justify-center p-4">
-            <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
-          </div>
-        )}
-        
-        {!isLoading && results.length === 0 && searchQuery && (
-          <CommandEmpty className="p-4 text-center text-sm text-gray-500">
-            No results found.
-          </CommandEmpty>
-        )}
-        
-        {!isLoading && results.length > 0 && (
-          <CommandGroup className="max-h-[300px] overflow-auto">
-            {results.map((result) => (
-              <CommandItem
-                key={result.id}
-                value={result.title}
-                className="px-4 py-3 cursor-pointer hover:bg-purple-50"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="font-medium">{result.title}</span>
-                  <span className="text-sm text-gray-600 line-clamp-2">
-                    {result.synopsis}
-                  </span>
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center justify-center p-4"
+            >
+              <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
+            </motion.div>
+          )}
+          
+          {!isLoading && results.length === 0 && searchQuery && (
+            <CommandEmpty className="p-4 text-center text-sm text-gray-500">
+              No results found.
+            </CommandEmpty>
+          )}
+          
+          {!isLoading && results.length > 0 && (
+            <CommandGroup className="max-h-[300px] overflow-auto">
+              {results.map((result) => (
+                <motion.div
+                  key={result.id}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                >
+                  <CommandItem
+                    value={result.title}
+                    className="px-4 py-3 cursor-pointer hover:bg-purple-50"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium">{result.title}</span>
+                      <span className="text-sm text-gray-600 line-clamp-2">
+                        {result.synopsis}
+                      </span>
+                    </div>
+                  </CommandItem>
+                </motion.div>
+              ))}
+            </CommandGroup>
+          )}
+        </AnimatePresence>
       </CommandList>
     </Command>
   );

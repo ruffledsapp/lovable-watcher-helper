@@ -1,10 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,14 +21,21 @@ const Index = () => {
       {/* Header */}
       <header className="fixed top-0 w-full bg-white/80 backdrop-blur-sm border-b border-purple-100 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
-            Watcher.my
+          <div className="flex items-center gap-2">
+            <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+              (my) watcher
+            </div>
+            <span className="text-sm text-gray-600 hidden md:inline">
+              what makes us different
+            </span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm">
-              Login
+              login
             </Button>
-            <Button>Sign Up</Button>
+            <Button>
+              jump in
+            </Button>
           </div>
         </div>
       </header>
@@ -32,8 +44,17 @@ const Index = () => {
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
-              Discover Your Next Watch
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+                We find your
+              </span>
+              <span 
+                className={`block mt-2 transition-all duration-1000 transform ${
+                  isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+                }`}
+              >
+                Next Watch
+              </span>
             </h1>
             <p className="text-lg text-gray-600 mb-8">
               Search and organize your favorite shows and movies in one place

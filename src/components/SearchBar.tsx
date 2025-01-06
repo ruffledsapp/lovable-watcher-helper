@@ -9,27 +9,59 @@ interface SearchResult {
   title: string;
   synopsis: string;
   verified?: boolean;
+  type: 'movie' | 'tv';
+  year: string;
 }
 
-// Mock data - replace with actual API call later
+// Enhanced mock data with popular shows and movies
 const mockResults: SearchResult[] = [
   {
     id: "1",
-    title: "Breaking Bad",
-    synopsis: "A high school chemistry teacher turned methamphetamine manufacturer partners with a former student to secure his family's financial future.",
-    verified: true
+    title: "House MD",
+    synopsis: "An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits.",
+    verified: true,
+    type: 'tv',
+    year: '2004'
   },
   {
     id: "2",
-    title: "Stranger Things",
-    synopsis: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",
-    verified: true
+    title: "I, Robot",
+    synopsis: "In 2035, a technophobic cop investigates a crime that may have been perpetrated by a robot, which leads to a larger threat to humanity. Starring Will Smith.",
+    verified: true,
+    type: 'movie',
+    year: '2004'
   },
   {
     id: "3",
+    title: "Breaking Bad",
+    synopsis: "A high school chemistry teacher turned methamphetamine manufacturer partners with a former student to secure his family's financial future.",
+    verified: true,
+    type: 'tv',
+    year: '2008'
+  },
+  {
+    id: "4",
+    title: "Stranger Things",
+    synopsis: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",
+    verified: true,
+    type: 'tv',
+    year: '2016'
+  },
+  {
+    id: "5",
     title: "The Crown",
     synopsis: "This drama follows the political rivalries and romance of Queen Elizabeth II's reign and the events that shaped the second half of the 20th century.",
-    verified: false
+    verified: true,
+    type: 'tv',
+    year: '2016'
+  },
+  {
+    id: "6",
+    title: "House of Cards",
+    synopsis: "A Congressman works with his equally conniving wife to exact revenge on the people who betrayed him.",
+    verified: true,
+    type: 'tv',
+    year: '2013'
   }
 ];
 
@@ -53,13 +85,18 @@ export function SearchBar() {
     console.log("Searching for:", query);
     
     try {
-      // Simulate API delay - replace with actual API call
+      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Filter mock results - replace with actual API call
-      const filtered = mockResults.filter(result => 
-        result.title.toLowerCase().includes(query.toLowerCase())
-      );
+      // Enhanced search logic with better matching
+      const filtered = mockResults.filter(result => {
+        const searchLower = query.toLowerCase();
+        const titleLower = result.title.toLowerCase();
+        const synopsisLower = result.synopsis.toLowerCase();
+        
+        return titleLower.includes(searchLower) || 
+               synopsisLower.includes(searchLower);
+      });
       
       setResults(filtered);
     } catch (error) {
@@ -94,7 +131,7 @@ export function SearchBar() {
           
           {!isLoading && results.length === 0 && searchQuery && (
             <CommandEmpty className="p-4 text-center text-sm text-gray-500">
-              No results found.
+              No results found. Try a different search term.
             </CommandEmpty>
           )}
           
@@ -114,6 +151,10 @@ export function SearchBar() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{result.title}</span>
+                        <span className="text-sm text-gray-500">({result.year})</span>
+                        <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
+                          {result.type}
+                        </span>
                         {result.verified && (
                           <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
                             Verified

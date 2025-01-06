@@ -1,20 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
+import { SearchBar } from "@/components/SearchBar";
 
 const Index = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Searching for:", searchQuery);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100">
@@ -60,23 +54,10 @@ const Index = () => {
               Search and organize your favorite shows and movies in one place
             </p>
             
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto">
-              <Input
-                type="text"
-                placeholder="Search for shows, movies, and more..."
-                className="w-full h-14 pl-5 pr-12 rounded-full border-2 border-purple-200 focus:border-purple-400 transition-colors"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Button 
-                type="submit"
-                size="icon"
-                className="absolute right-2 top-2 rounded-full"
-              >
-                <Search className="h-5 w-5" />
-              </Button>
-            </form>
+            {/* Search Section */}
+            <div className="max-w-2xl mx-auto">
+              <SearchBar />
+            </div>
           </div>
 
           {/* Feature Cards */}
